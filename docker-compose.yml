@@ -1,0 +1,22 @@
+# Single-node Redpanda (Kafka-compatible). Two listeners:
+#   internal  -> redpanda:9092   (for other containers, e.g. a future Airflow)
+#   external  -> localhost:19092 (for Python / Spark running on YOUR machine)
+services:
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:latest   # pin a version once it works for you
+    container_name: redpanda
+    command:
+      - redpanda
+      - start
+      - --mode dev-container
+      - --smp 1
+      - --memory 1G
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+    ports:
+      - "19092:19092"
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+
+volumes:
+  redpanda-data:
